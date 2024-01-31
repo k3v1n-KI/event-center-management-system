@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Create Event</title>
+{% endblock %}
+
+
+{% block body %}
+<h1>Create Event</h1>
+<hr>{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              <strong>{{msg}}</strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<p style="color: green;">{{ success }}</p>
+<form method="POST">
+    <input type="text" class="form-control" name="create_first_name" placeholder="First Name" required>
+    <br>
+    <input type="text" class="form-control" name="create_last_name" placeholder="Last Name" required>
+    <br>
+    <input type="email" class="form-control" name="create_email" placeholder="Email" required>
+    <br>
+    <input type="tel" class="form-control" name="create_number" placeholder="Phone Number" required>
+    <br>
+    <input type="text" class="form-control" name="create_event" placeholder="Event" required>
+    <br>
+    <select name="create_people" class="form-control custom_select">
+        <option value="Less than 30">Less Than 30</option>
+        <option value="30-60">30 - 60</option>
+        <option value="60-100">60 - 100</option>
+        <option value="100+">100+</option>
+    </select>
+    <br>
+    <a href="/schedule" class="btn btn-primary" target="_blank">See available dates</a>
+    <input type="datetime-local" min="{{ get_min_date() }}" name="create_event_time"
+           id="taskdatetime" placeholder="When..." class="form-control"/>
+    <br>
+    <input class="btn btn-success" type="submit" value="Create Event">
+</form>
+
+{% endblock %}

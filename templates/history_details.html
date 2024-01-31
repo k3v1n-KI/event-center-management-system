@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Event Details</title>
+{% endblock %}
+
+
+{% block body %}
+<h1>Event Details</h1>
+<hr>
+<form method="POST">
+    <label for="create_first_name">First Name</label>
+    <input type="text" class="form-control" value="{{ event["first_name"] }}" id="create_first_name" readonly>
+    <br>
+    <label for="create_last_name">Last Name</label>
+    <input type="text" class="form-control" value="{{ event["last_name"] }}" id="create_last_name" readonly>
+    <br>
+    <label for="booking_code">Booking Code</label>
+    <input type="text" class="form-control" value="{{ event["booking_code"] }}" id="booking_code" readonly>
+    <br>
+    <label for="create_email">Email</label>
+    <input type="email" class="form-control" value="{{ event["email"] }}" id="create_email" readonly>
+    <br>
+    <label for="create_number">Number</label>
+    <input type="tel" class="form-control" value="{{ event["number"] }}" id="create_number" readonly>
+    <br>
+    <label for="create_event">Event</label>
+    <input type="text" class="form-control" value="{{ event["event"] }}" id="create_event" readonly>
+    <br>
+    <label for="create_people">Number of People</label>
+    <input type="text" class="form-control" value="{{ event["people"] }}" id="create_people" readonly>
+    <br>
+    <label for="date">Date of Event</label>
+    <input type="text"  value="{{event_time.strftime('%a, %B %d, %Y')}}" id="date" class="form-control" readonly/>
+    <br>
+    <label for="time">Time of Event</label>
+    <input type="text"  value="{{event_time.strftime('%I:%M %p')}}" id="time" class="form-control" readonly/>
+    <br>
+    <h1>Payment Details</h1>
+    <hr>
+    <label for="payment">Payment Status</label>
+    {% if event["payment"] == 100000 %}
+        <input type="text" class="form-control" id="payment" value="Deposit Made: N100,000" readonly>
+        <br>
+    {% elif event["payment"] == 200000 %}
+        <input type="text" class="form-control" id="payment" value="Complete Fee Paid: N200,000" readonly>
+        <br>
+    {% else %}
+        <input type="text" class="form-control" id="payment" value="No Payments Made" readonly>
+        <br>
+    {% endif %}
+    {% if event["dep_ref_code"] != 0 %}
+        <label for="deposit_date">Deposit Date</label>
+        <input type="text" class="form-control" id="deposit_date" value="{{ getPaymentDate(event["dep_ref_code"],
+        transactions).strftime('%a, %B %d, %Y') }}" readonly>
+        <br>
+        <label for="deposit_time">Deposit Time</label>
+        <input type="text" class="form-control" id="deposit_time" value="{{ getPaymentDate(event["dep_ref_code"],
+        transactions).strftime('%I:%M %p') }}" readonly>
+        <br>
+        <label for="deposit_reference_code">Deposit Payment Reference Code</label>
+        <!-- <input type="text" class="form-control" id="deposit_reference_code"
+        value="{{event["dep_ref_code"]}}" readonly> -->
+        <a style="color: white;" href="https://dashboard.paystack.com/#/search?model=transactions&query={{event["dep_ref_code"]}}"
+           target="_blank"><input type="text" class="form-control" id="deposit_reference_code"
+                                  value="{{event.dep_ref_code}}" disabled></a>
+        <br>
+    {% endif %}
+    {% if event["ref_code"] != 0 %}
+        <label for="complete_payment_date">Complete Payment Date</label>
+        <input type="text" class="form-control" id="complete_payment_date" value="{{ getPaymentDate(event["ref_code"],
+        transactions).strftime('%a, %B %d, %Y') }}" readonly>
+        <br>
+        <label for="complete_payment_time">Complete Payment Time</label>
+        <input type="text" class="form-control" id="complete_payment_time" value="{{ getPaymentDate(event["ref_code"],
+        transactions).strftime('%I:%M %p') }}" readonly>
+        <br>
+        <label for="complete_payment_reference_code">Complete Payment Reference Code</label>
+        <!-- <input type="text" class="form-control" id="complete_payment_reference_code"
+        value="{{event["ref_code"]}}" readonly> -->
+        <a style="color: white;" href="https://dashboard.paystack.com/#/search?model=transactions&query={{event["ref_code"]}}"
+           target="_blank"><input type="text" class="form-control" id="complete_payment_reference_code"
+                                  value="{{event.ref_code}}" disabled></a>
+        <br>
+    {% endif %}
+</form>
+
+{% endblock %}

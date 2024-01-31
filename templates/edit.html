@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Edit Event</title>
+{% endblock %}
+
+
+{% block body %}
+<h1>Edit Event</h1>
+<hr>
+<form method="POST">
+    <input type="text" value="{{ event["first_name"] }}" class="form-control" name="first_name" placeholder="First Name"
+        required>
+    <br>
+    <input type="text" value="{{ event["last_name"] }}" class="form-control" name="last_name" placeholder="Last Name"
+        required>
+    <br>
+    <input type="email" value="{{ event["email"] }}" class="form-control" name="email" placeholder="Email" required>
+    <br>
+    <input type="tel" value="{{ event["number"] }}" class="form-control" name="number" placeholder="Phone Number" required>
+    <br>
+    <input type="text" value="{{ event["event"] }}" class="form-control" name="event" placeholder="Event" required>
+    <br>
+    <select name="people" value="{{ event["people"] }}" class="form-control custom_select">
+        {% if event["people"] == "Less than 30" %}
+            <option value="Less than 30" selected>Less Than 30</option>
+        {% else %}
+            <option value="Less than 30">Less Than 30</option>
+        {% endif %}
+        {% if event["people"] == "30-60" %}
+            <option value="30-60" selected>30 - 60</option>
+        {% else %}
+            <option value="30-60">30 - 60</option>
+        {% endif %}
+        {% if event["people"] == "60-100" %}
+            <option value="60-100" selected>60 - 100</option>
+        {% else %}
+            <option value="60-100">60 - 100</option>
+        {% endif %}
+
+        {%if event["people"] == "100+" %}
+            <option value="100+" selected>100+</option>
+        {% else %}
+            <option value="100+">100+</option>
+        {% endif %}
+    </select>
+    <br>
+    <a href="/schedule" class="btn btn-primary" target="_blank">See available dates</a>
+    <input type="datetime-local" id="datefield"
+        value="{{event_time.year}}-{{month}}-{{day}}T{{hour}}:{{minute}}:00"
+        name="event_time" min="{{get_min_date()}}" id="taskdatetime" class="form-control" />
+    <br>
+    <input class="btn btn-success" type="submit" value="Save">
+</form>
+
+
+{% endblock %}

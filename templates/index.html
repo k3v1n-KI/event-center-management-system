@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>DBMS</title>
+<style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td,
+    th {
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+</style>
+{% endblock %}
+
+
+{% block body %}
+
+<h1>Upcoming Events</h1>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+              <strong>{{msg}}</strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+{% if len(events) != 0 %}
+<table>
+    <thead>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Booking Code</th>
+        <th>Email</th>
+        <th>Number</th>
+        <th>Event</th>
+        <th>People</th>
+        <th>Date</th>
+        <th>Time</th>
+    </thead>
+    <tbody>
+        {% for event in events %}
+        <tr>
+            <td>{{ event.val()["first_name"] }}</td>
+            <td>{{ event.val()["last_name"] }}</td>
+            <td>{{ event.val()["booking_code"] }}</td>
+            <td>{{ event.val()["email"] }}</td>
+            <td>{{ event.val()["number"] }}</td>
+            <td>{{ event.val()["event"] }}</td>
+            <td>{{ event.val()["people"] }} People</td>
+            <td>{{ string_to_datetime(event.val()["event_time"]).strftime("%a, %B %d, %Y") }}</td>
+            <td>{{ string_to_datetime(event.val()["event_time"]).strftime("%I:%M %p") }}</td>
+            <td><a class="btn btn-primary" href="/details/{{ event.val()['booking_code'] }}">Details</a></td>
+        </tr>
+
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<br>
+<br>
+<h4>There are no events scheduled</h4>
+{% endif %}
+
+{% endblock %}

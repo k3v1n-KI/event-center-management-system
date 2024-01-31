@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Event Details</title>
+{% endblock %}
+    
+
+{% block body %}
+{% block user %}<a class="navbar-brand" href="/" style="color: white;">{{ user }}</a>{% endblock %}
+<h1>Event Details</h1>
+<hr>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              <strong>{{msg}}</strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<form method="post" action="/pay/{{ event["booking_code"] }}/deposit">
+    <label for="create_first_name">First Name</label>
+    <input type="text" class="form-control" value="{{ event["first_name"] }}" id="create_first_name" readonly>
+    <br>
+    <label for="create_last_name">Last Name</label>
+    <input type="text" class="form-control" value="{{ event["last_name"] }}" id="create_last_name" readonly>
+    <br>
+    <label for="booking_code">Booking Code</label>
+    <input type="text" class="form-control" value="{{ event["booking_code"] }}" id="booking_code" readonly>
+    <br>
+    <label for="create_email">Email</label>
+    <input type="email" class="form-control" value="{{ event["email"] }}" id="create_email" readonly>
+    <br>
+    <label for="create_number">Number</label>
+    <input type="tel" class="form-control" value="{{ event["number"] }}" id="create_number" readonly>
+    <br>
+    <label for="create_event">Event</label>
+    <input type="text" class="form-control" value="{{ event["event"] }}" id="create_event" readonly>
+    <br>
+    <label for="create_people">Number of People</label>
+    <input type="text" class="form-control" value="{{ event["people"] }}" id="create_people" readonly>
+    <br>
+    <label for="date">Date of Event</label>
+    <input type="text"  value="{{event_time.strftime('%a, %B %d, %Y')}}" id="date" class="form-control" readonly/>
+    <br>
+    <label for="time">Time of Event</label>
+    <input type="text"  value="{{event_time.strftime('%I:%M %p')}}" id="time" class="form-control" readonly/>
+    <div  style="text-align: right;">
+        <a class="btn btn-primary float-right" href="/edit/{{ event["booking_code"] }}">Edit</a>
+        <a class="btn btn-danger float-right" onclick="clicked(event)" href="/delete/{{ event["booking_code"] }}">Delete</a>
+    </div>
+    <script>
+        function clicked(e)
+        {
+            if(!confirm('Are you sure you want to cancel this event? This cannot be undone')) {
+                e.preventDefault();
+            }
+        }
+    </script>
+    <br>
+    <h1>Payment Details</h1>
+    <hr>
+    <label for="payment">Payment Status</label>
+    {% if 0 < event["payment"] < price %}
+        <input type="text" class="form-control" id="payment" value="Deposit Made: {{ format_currency(event['payment']) }}" readonly>
+        <div style="text-align: right;">
+            <a class="btn btn-success float-right" onclick="payment_confirmation(event, 'complete')"
+           href="/pay/{{ event["booking_code"] }}/d_complete">Complete Payment</a>
+        </div>
+
+        <br>
+    {% elif event["payment"] == price %}
+        <input type="text" class="form-control" id="payment" value="Complete Fee Paid: N400,000" readonly>
+        <br>
+    {% else %}
+        <input type="text" class="form-control" id="payment" value="No Payments Made" readonly>
+            <br>
+            <label for="deposit_check">Make Deposit</label>
+            <input type="checkbox" onclick="myFunction()" id="deposit_check">
+            <br>
+            <br id="break" style="display: none">
+            <label for="deposit" style="display: none" id="deposit_label">Deposit Amount</label>
+            <input type="number" style="display: none" name="deposit" class="form-control" id="deposit" required value={{ deposit }}>
+            <br>
+            <input type="submit" style="display: none" value="Make Deposit" class="btn btn-primary float-right"
+                   id="submit" onclick="payment_confirmation(event, 'deposit')">
+{#            <a class="btn btn-primary float-right" onclick="payment_confirmation(event, 'deposit')"#}
+{#           href="/pay/{{ event["booking_code"] }}/deposit">Make Deposit</a>#}
+            <a class="btn btn-success float-right" style="display: block" id="pay_in_full" onclick="payment_confirmation(event, 'full')"
+           href="/pay/{{ event["booking_code"] }}/complete">Pay in Full</a>
+
+        <br>
+    {% endif %}
+    <script>
+        function myFunction() {
+            // Get the checkbox
+            let checkBox = document.getElementById("deposit_check");
+            // Get the output text
+            let deposit = document.getElementById("deposit");
+            let deposit_label = document.getElementById("deposit_label");
+            let pay_in_full = document.getElementById("pay_in_full");
+            let break_button = document.getElementById("break");
+            let submit = document.getElementById("submit");
+
+
+            // If the checkbox is checked, display the output text
+            if (checkBox.checked === true) {
+                deposit_label.style.display = 'block';
+                deposit.style.display = 'block';
+                submit.style.display = 'block';
+                pay_in_full.style.display = 'none';
+                break_button.style.display = 'block';
+            } else {
+                deposit_label.style.display = 'none';
+                deposit.style.display = 'none';
+                submit.style.display = 'none';
+                break_button.style.display = 'none';
+                pay_in_full.style.display = 'block';
+            }
+        }
+        function payment_confirmation(e, payment_type)
+        {
+            if (payment_type === "complete"){
+                if(!confirm('Are you sure you want to complete this payment?: {{format_currency(price-event['payment'])}} This cannot be undone')) {
+                    e.preventDefault();
+                }
+            }
+            else if (payment_type === "deposit"){
+                if(!confirm('Are you sure you want to make this deposit? This cannot be undone')) {
+                    e.preventDefault();
+                }
+            }
+            else if (payment_type === "full"){
+                if(!confirm('Are you sure you want to make this complete payment?: {{format_currency(price)}} This cannot be undone')) {
+                    e.preventDefault();
+                }
+            }
+
+        }
+    </script>
+    {% if event["dep_ref_code"] != 0 %}
+        <label for="deposit_date">Deposit Date</label>
+        <input type="text" class="form-control" id="deposit_date"
+               value="{{ getPaymentDate(event["dep_ref_code"], transactions).strftime('%a, %B %d, %Y') }}" readonly>
+        <br>
+        <label for="deposit_time">Deposit Time</label>
+        <input type="text" class="form-control" id="deposit_time"
+               value="{{ getPaymentDate(event["dep_ref_code"], transactions).strftime('%I:%M %p') }}" readonly>
+        <br>
+        <label for="deposit_reference_code">Deposit Payment Reference Code</label>
+        <!-- <input type="text" class="form-control" id="deposit_reference_code" value="{{event["dep_ref_code"]}}" readonly> -->
+        <a style="color: white;" href="https://dashboard.paystack.com/#/search?model=transactions&query={{event["dep_ref_code"]}}"
+           target="_blank"><input type="text" class="form-control" id="deposit_reference_code"
+                                  value="{{event.dep_ref_code}}" disabled></a>
+        <br>
+    {% endif %}
+    {% if event["ref_code"] != 0 %}
+        <label for="complete_payment_date">Complete Payment Date</label>
+        <input type="text" class="form-control" id="complete_payment_date"
+               value="{{ getPaymentDate(event["ref_code"], transactions).strftime('%a, %B %d, %Y') }}" readonly>
+        <br>
+        <label for="complete_payment_time">Complete Payment Time</label>
+        <input type="text" class="form-control" id="complete_payment_time"
+               value="{{ getPaymentDate(event["ref_code"], transactions).strftime('%I:%M %p') }}" readonly>
+        <br>
+        <label for="complete_payment_reference_code">Complete Payment Reference Code</label>
+        <!-- <input type="text" class="form-control" id="complete_payment_reference_code" value="{{event["ref_code"]}}" readonly> -->
+        <a style="color: white;" href="https://dashboard.paystack.com/#/search?model=transactions&query={{event["ref_code"]}}"
+           target="_blank"><input type="text" class="form-control" id="complete_payment_reference_code"
+                                  value="{{event.ref_code}}" disabled></a>
+        <br>
+    {% endif %}
+</form>
+
+{% endblock %}
